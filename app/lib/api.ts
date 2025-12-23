@@ -1,4 +1,5 @@
-const API_BASE_URL = "https://proj.12082004.xyz";
+const API_BASE_URL = "http://localhost:3000";
+// const API_BASE_URL = "https://proj.12082004.xyz";
 
 export interface ProjectCreateInput {
   project_name: string;
@@ -96,6 +97,20 @@ export interface ScrapedDataResponse {
   variants: Record<string, ScrapedFile[]>;
 }
 
+export interface HistoryItem {
+  id: number;
+  project_id: string;
+  query: string;
+  model_id: string;
+  response: QueryResponse;
+  timestamp: string;
+}
+
+export interface HistoryResponse {
+  project_id: string;
+  history: HistoryItem[];
+}
+
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = new URL(`${API_BASE_URL}${endpoint}`);
   
@@ -178,5 +193,11 @@ export async function getScrapedData(projectId: string): Promise<ScrapedDataResp
   return apiFetch<ScrapedDataResponse>("/scrapeddata", {
     method: "GET",
     body: JSON.stringify({ project_id: projectId }),
+  });
+}
+
+export async function getHistory(projectId: string): Promise<HistoryResponse> {
+  return apiFetch<HistoryResponse>(`/api/history/${projectId}`, {
+    method: "GET",
   });
 }

@@ -1,26 +1,27 @@
 import * as React from "react"
-import { getProjectInfo, getProjectStatus, getModels, getScrapedData } from "@/app/lib/api"
-import { ModelQuery } from "@/components/model-query"
+import { getProjectInfo, getProjectStatus, getModels, getScrapedData, getHistory } from "@/app/lib/api"
+import { ProjectAnalysisContainer } from "@/components/project-analysis-container"
 import { VariantsExplorer } from "@/components/variants-explorer"
 import { ScrapedDataExplorer } from "@/components/scraped-data-explorer"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sparkles, Calendar, User, Tag, ArrowLeft, Terminal, LayoutList, Activity } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { formatDate, formatRelativeDate } from "@/lib/utils"
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  let info, status, models, scrapedData
+  let info, status, models, scrapedData, history
   try {
-    [info, status, models, scrapedData] = await Promise.all([
+    [info, status, models, scrapedData, history] = await Promise.all([
       getProjectInfo(id),
       getProjectStatus(id),
       getModels(),
       getScrapedData(id),
+      getHistory(id),
     ])
   } catch (e) {
     console.error(e)
@@ -55,7 +56,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                   <div className="p-1 rounded-md bg-primary/10">
                     <Calendar className="h-3 w-3 text-primary" />
                   </div>
-                  Updated {status.last_updated}
+                  Updated {formatRelativeDate(status.last_updated)}
                 </span>
               </div>
             </div>
@@ -90,7 +91,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
               </CardContent>
             </Card>
 
-            <ModelQuery projectId={id} models={models} />
+            <ProjectAnalysisContainer
+              projectId={id}
+              models={models}
+              initialHistory={history.history}
+            />
           </div>
 
           {/* Sidebar: Description - Sticky Fix: self-start ensures the column height is content-based, allowing sticky to work within parent grid */}
@@ -131,7 +136,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2"><Calendar className="h-3 w-3" /> Updated</span>
-                    <span>{status.last_updated}</span>
+                    <span>{formatDate(status.last_updated)}</span>
                   </div>
                 </div>
               </CardContent>

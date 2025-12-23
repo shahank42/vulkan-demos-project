@@ -1,13 +1,31 @@
 import * as React from "react"
 import { CreateProjectDialog } from "@/components/create-project-dialog"
 import { Sparkles, ArrowRight, FolderOpen } from "lucide-react"
-import { getProjects } from "@/app/lib/api"
+import { getProjects, getProjectInfo } from "@/app/lib/api"
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 export default async function HomePage() {
   const projectIds = await getProjects().catch(() => [])
+
+  const projectsMetadata = await Promise.all(
+    projectIds.map(async (id) => {
+      try {
+        const info = await getProjectInfo(id);
+        return { id, ...info };
+      } catch (e) {
+        console.error(`Failed to fetch info for project ${id}:`, e);
+        return {
+          id,
+          project_name: `Project ${id.slice(0, 8)}`,
+          description: "Details unavailable",
+          tags: [],
+          creator_name: "Unknown"
+        };
+      }
+    })
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground relative selection:bg-primary/20">
@@ -49,13 +67,13 @@ export default async function HomePage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-2">
               <p className="text-sm text-muted-foreground font-medium pl-1">
-                {projectIds.length} Project{projectIds.length !== 1 ? 's' : ''}
+                {projectsMetadata.length} Project{projectsMetadata.length !== 1 ? 's' : ''}
               </p>
             </div>
 
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {projectIds.map((id) => (
-                <Link key={id} href={`/project/${id}`} className="block group h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-xl">
+              {projectsMetadata.map((project) => (
+                <Link key={project.id} href={`/project/${project.id}`} className="block group h-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-xl">
                   <Card className="h-full border-muted-foreground/10 hover:border-primary/40 bg-card hover:bg-card/80 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 p-0 overflow-hidden group-focus:border-ring">
                     <CardHeader className="p-4 space-y-2 pb-2">
                       <div className="flex items-center justify-between">
@@ -63,19 +81,29 @@ export default async function HomePage() {
                           <FolderOpen className="h-4 w-4" />
                         </div>
                         <Badge variant="outline" className="font-mono text-[10px] h-5 px-1.5 bg-background/50 text-muted-foreground group-hover:border-primary/30 transition-colors">
-                          {id.slice(0, 6)}
+                          {project.id.slice(0, 6)}
                         </Badge>
                       </div>
                       <CardTitle className="text-base font-medium tracking-tight group-hover:text-primary transition-colors truncate pt-2">
-                        Project {id.slice(0, 8)}
+                        {project.project_name}
                       </CardTitle>
+                      {project.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {project.description}
+                        </p>
+                      )}
                     </CardHeader>
                     <CardContent className="p-4 pt-0 pb-4">
-                      {/* Separator removed */}
-                      <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
-                        <span className="flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500/50"></span>
-                          Active
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {project.tags?.slice(0, 3).map((tag, i) => (
+                          <Badge key={i} variant="secondary" className="text-[10px] px-1 h-4 font-normal opacity-70">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1.5 font-medium text-foreground/60">
+                          {project.creator_name}
                         </span>
                         <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform duration-300 text-primary/80 opacity-0 group-hover:opacity-100">
                           Open <ArrowRight className="h-3 w-3" />
