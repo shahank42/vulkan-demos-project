@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "https://proj.12082004.xyz";
 
 export interface ProjectCreateInput {
   project_name: string;
@@ -47,9 +47,44 @@ export interface QueryInput {
   model_id: string;
 }
 
+export interface Evidence {
+    reason: string;
+    evidence_citation: string;
+    perspective_source: string;
+    confidence: number;
+}
+
+export interface Weakness {
+    issue: string;
+}
+
+export interface Critique {
+    weaknesses?: Weakness[];
+    adjusted_score_suggestion?: number;
+    valid_points?: string[];
+    blind_spots?: string[];
+}
+
+export interface DebateSummary {
+    perspective_a_strength: number;
+    perspective_b_strength: number;
+    consensus_areas: string[];
+    unresolved_disagreements: string[];
+}
+
 export interface QueryResponse {
-  response: string;
-  biases: Record<string, number>;
+    score: number;
+    alignment: string;
+    justifications: Evidence[];
+    identified_devices: string[];
+    uncertainty: number;
+    reasoning: string;
+    biases: Record<string, number>;
+    approach_used: string;
+    consensus_areas?: string[];
+    disagreement_areas?: string[];
+    debate_summary?: DebateSummary;
+    error?: string;
 }
 
 export interface ScrapedFile {
