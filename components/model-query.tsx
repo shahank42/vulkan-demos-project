@@ -58,13 +58,13 @@ export function ModelQuery({
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent rounded-[24px] blur-md opacity-40 group-hover:opacity-60 transition duration-700"></div>
         <Card className="relative shadow-2xl border-border/40 bg-background/60 backdrop-blur-xl overflow-hidden rounded-[22px] transition-all duration-300 ring-1 ring-white/5 group-hover:ring-white/10">
           <CardContent className="p-0">
-            <form onSubmit={handleQuery} className="group/form relative">
+            <form onSubmit={handleQuery} className="group/form relative pb-20">
               <Textarea
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ask a question or describe what you want to analyze..."
                 disabled={isQuerying}
-                className="w-full min-h-[120px] px-6 py-4 pb-16 border-none shadow-none resize-none bg-transparent focus-visible:ring-0 text-lg placeholder:text-muted-foreground/40 leading-relaxed font-light scrollbar-hide"
+                className="w-full h-[160px] px-6 py-4 pb-24 border-none shadow-none resize-none bg-transparent focus-visible:ring-0 text-lg placeholder:text-muted-foreground/40 leading-relaxed font-light overflow-y-auto"
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!isQuerying && query.trim()) handleQuery(e as any); } }}
               />
 

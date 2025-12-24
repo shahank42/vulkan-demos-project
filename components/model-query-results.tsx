@@ -13,44 +13,42 @@ interface ModelQueryResultsProps {
 
 export function ModelQueryResults({ data }: ModelQueryResultsProps) {
   const getScoreColor = (score: number) => {
-    if (score <= 40) return "text-indigo-500"
-    if (score >= 60) return "text-emerald-500"
-    return "text-slate-500"
+    if (score <= 40) return "text-indigo-400"
+    if (score >= 60) return "text-emerald-400"
+    return "text-slate-400"
+  }
+
+  const getScoreGlow = (score: number) => {
+    if (score <= 40) return "drop-shadow-[0_0_25px_rgba(129,140,248,0.4)]"
+    if (score >= 60) return "drop-shadow-[0_0_25px_rgba(52,211,153,0.4)]"
+    return "drop-shadow-[0_0_25px_rgba(148,163,184,0.3)]"
   }
 
   return (
     <div className="space-y-4 animate-in fade-in duration-700">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-        <Card className="md:col-span-8 shadow-sm border-border/40 bg-gradient-to-br from-card to-secondary/5 overflow-hidden">
-          <CardContent className="p-6 md:p-7 flex flex-col justify-between h-full relative">
-            <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="flex items-start justify-between relative z-10">
-              <div className="space-y-2">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                  <Zap className="h-3 w-3" /> Neutrality Score
-                </span>
-                <div className="flex items-baseline gap-3">
-                  <span className={cn("text-6xl md:text-7xl font-bold tracking-tighter leading-none", getScoreColor(data.score))}>
-                    {data.score}
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-medium text-muted-foreground">/ 100</span>
-                    <Badge variant="outline" className="text-[10px] uppercase tracking-wider h-5 px-1.5 font-mono">
-                      {data.alignment.replace(/_/g, " ")}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-              <Badge variant="secondary" className="font-mono text-[10px] uppercase opacity-70">
+        <Card className="md:col-span-8 shadow-xl border-border/40 bg-[#050505] overflow-hidden group">
+          <CardContent className="p-8 md:p-10 flex flex-col h-full relative">
+            <div className="absolute right-0 top-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors duration-1000" />
+
+            <div className="flex items-center justify-between relative z-10 mb-auto">
+              <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Zap className="h-3.5 w-3.5 text-primary/80" /> Neutrality Score
+              </span>
+              <Badge variant="outline" className="font-mono text-[10px] uppercase border-primary/20 bg-primary/5 text-primary/70 px-2 py-0.5">
                 {data.approach_used.replace(/_/g, ' ')}
               </Badge>
             </div>
-            <div className="mt-4 relative z-10">
-              <div className="mb-2 flex justify-between items-end text-sm">
-                <span className={cn("font-medium transition-colors", data.score <= 40 ? "text-foreground" : "text-muted-foreground")}>Variant A Focus</span>
-                <span className={cn("font-medium transition-colors", data.score >= 60 ? "text-foreground" : "text-muted-foreground")}>Variant B Focus</span>
+
+            <div className="flex-1 flex flex-col justify-center items-center py-12 relative z-10">
+              <div className={cn(
+                "text-5xl md:text-7xl font-black tracking-tight uppercase transition-all duration-700 text-center",
+                getScoreColor(data.score),
+                getScoreGlow(data.score)
+              )}>
+                {data.alignment.replace(/_/g, " ")}
               </div>
-              <BiasMeterSimple biases={data.biases} />
+              <div className="mt-4 h-1 w-24 rounded-full bg-gradient-to-r from-transparent via-border/50 to-transparent" />
             </div>
           </CardContent>
         </Card>
